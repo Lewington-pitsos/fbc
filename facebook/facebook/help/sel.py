@@ -148,15 +148,10 @@ def reactions(response, kind: str) -> list:
     return reactions
 
 def meta_comment_reacts(json_body: dict) -> list:
-    print("response body")
-    print(json_body)
-    
-
     reaction_body = list(parse
     ("$..jsmods..markup..__html").find(json_body))
 
     if len(reaction_body) == 0:
-        print("no reactions")
         return []
 
     return reactions(Selector(text=reaction_body[0].value), "unknown")

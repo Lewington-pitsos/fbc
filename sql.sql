@@ -2,7 +2,7 @@ CREATE TABLE comment_number (
     highest BIGINT NOT NULL DEFAULT 221534646352
 );
 
-CREATE TABLE meta_comments 
+CREATE TABLE meta_comments (
     id SERIAL,
     comment VARCHAR (1000) NOT NULL,
     info VARCHAR(2000) NOT NULL,

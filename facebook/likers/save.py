@@ -18,5 +18,3 @@ def save_likers(html, page_name: str, page_id: int):
             "name" : result.xpath(".//a[@class='_32mo']/@href")[0],
             "link" : result.xpath(".//a[@class='_32mo']/span/text()")[0],
         }, supplier_id)
-    
-    print("Saving complete")

@@ -25,5 +25,3 @@ steps.keep_scrolling(driver, 100)
 
 save.save_likers(driver.page_source, page_name, page_id)
 
-print("Hell yeah")
-

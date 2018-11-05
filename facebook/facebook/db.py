@@ -89,6 +89,10 @@ class db:
         self.cursor.execute("""SELECT id, name, page_id FROM suppliers""")
         return self.cursor.fetchall()
 
+    def get_community_suppliers(self) -> dict:
+        self.cursor.execute("""SELECT id, name, page_id FROM suppliers WHERE has_community = True ORDER BY id""")
+        return self.cursor.fetchall()
+
     def save_meta_comment(self, comment_id: int, meta_comment: dict):
         user_id = self.save_user(meta_comment)
         self.save_meta_commenter(user_id, comment_id, meta_comment)

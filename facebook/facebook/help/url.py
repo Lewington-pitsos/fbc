@@ -24,7 +24,8 @@ def meta_comment_url() -> str:
         return "https://www.facebook.com/ajax/ufi/comment_fetch.php?dpr=1"
 
 def meta_comment_body(user_id: int) -> str:
-        return "ft_ent_identifier={cid}&length=22&__a=1&fb_dtsg=AQGIGylj3H5O%3AAQH29gwf-pRi" + user_id_param.format(uid=user_id)
+        # NOTE, you might have to change fb_dtsg
+        return "ft_ent_identifier={cid}&length=22&__a=1&fb_dtsg=AQHhxQX9ZtFX:AQGaX9MIrn6k" + user_id_param.format(uid=user_id)
 
 def meta_comment_react(user_id: int) -> str:
         return "https://www.facebook.com/ufi/reaction/profile/dialog/?ft_ent_identifier={mcid}&dpr=1&__asyncDialog=1&__a=1&__req=6y&__rev=4497859&__spin_r=4497859&__spin_b=trunk&__spin_t=1541277517" + user_id_param.format(uid=user_id)

@@ -11,10 +11,11 @@ huge_step = 10000000
 class CommentsSpider(scrapy.Spider):
     name = "comments"
 
-    def __init__(self, page_id, user_id, cookies, supplier_id):
+    def __init__(self, supplier_name, page_id, user_id, cookies, supplier_id):
         self.db = db.db()
         self.prev_highest_cn = self.db.get_highest_cn()
         self.brain = brain.brain()
+        self.supplier_name = supplier_name
         self.page_url = url.page_url(page_id, user_id)
         self.cookies = cookies
         self.supplier_id = supplier_id
@@ -83,9 +84,10 @@ class CommentsSpider(scrapy.Spider):
                         }
                     )
                 
+                print("saving meta commenter")
                 yield self.meta_commenter_request(comment_id, comment["cid"])   
         else:
-            print("Scrape finished")
+            print("Scrape finished {}".format(self.supplier_name))
     
     def save_reactions(self, response):
         comment_id = response.meta.get("cid")
@@ -101,8 +103,6 @@ class CommentsSpider(scrapy.Spider):
             self.db.save_meta_comment(comment_id, commenter)
 
             for comment in commenter["comments"]:
-                print(self.meta_comment_react_url.format(mcid=comment["id"]))
-
                 yield scrapy.Request(
                     url=self.meta_comment_react_url.format(mcid=comment["id"]),
                     cookies=self.cookies,
@@ -111,10 +111,8 @@ class CommentsSpider(scrapy.Spider):
                 )
     
     def save_meta_comment_reactions(self, response):
-        print("getting meta comment reactions")
         meta_comment_id = response.meta.get("mcid")
         meta_reactions = sel.meta_comment_reacts(conv.to_json(response.body))
-        print(meta_reactions)
         self.db.save_meta_reactions(meta_comment_id, meta_reactions)
 
         

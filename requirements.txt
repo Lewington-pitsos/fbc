@@ -21,7 +21,6 @@ mccabe==0.6.1
 mypy==0.641
 mypy-extensions==0.4.1
 parsel==1.5.1
-pkg-resources==0.0.0
 ply==3.11
 psycopg2==2.7.5
 pyasn1==0.4.4
