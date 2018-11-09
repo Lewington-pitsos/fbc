@@ -4,14 +4,31 @@ path = "https://www.facebook.com/pages_reaction_units/more/?"
 page_id_param = "&page_id={pid}"
 user_id_param = "&__user={uid}"
 cursor = "&cursor=%7B%22timeline_cursor%22%3A%{cn}%22%2C%22timeline_section_cursor%22%3Anull%2C%22has_next_page%22%3Afalse%7D"
-remaining_params = "&surface=www_pages_community_tab&unit_count=8&__a=1"
+remaining_params = "&unit_count=8&__a=1"
 
-def page_url(page_id: int, user_id: int) -> str:
+page_type_community = "&surface=www_pages_community_tab"
+
+
+home_cursor = "&cursor=%7B%22timeline_cursor%22%3A%22timeline_unit%3A1%3A0000000000{cn}%3A04611686018427387904%3A09223372036854775788%3A04611686018427387904%22%2C%22timeline_section_cursor%22%3A%7B%7D%2C%22has_next_page%22%3Atrue%7D"
+page_type_home = "&surface=www_pages_home"
+
+def home_page_url(page_id: int, user_id: int) -> str:
+    return "".join([        
+        path,
+        page_id_param.format(pid=page_id),
+        home_cursor,
+        user_id_param.format(uid=user_id),
+        page_type_home,
+        remaining_params,
+    ])
+
+def community_page_url(page_id: int, user_id: int) -> str:
     return "".join([
             path,
             page_id_param.format(pid=page_id),
             cursor,
             user_id_param.format(uid=user_id),
+            page_type_community,
             remaining_params,
     ])
 

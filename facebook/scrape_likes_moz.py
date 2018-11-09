@@ -18,32 +18,35 @@ steps.login(driver, user_email, user_password)
 for supplier in suppliers:
     supplier_id, page_name, page_id = supplier
 
-    likers_url = "https://m.facebook.com/search/{}/likers".format(page_id)
+    if supplier_id not in [2]:
 
-    driver.get(likers_url)
+        likers_url = "https://m.facebook.com/search/{}/likers".format(page_id)
 
-    database = db.db()
-    supplier_id = database.save_supplier(page_name, page_id)
+        driver.get(likers_url)
 
-    while True:
-        try:
-            likers = steps.get_likers(driver)
-            for liker in likers:
-                database.save_like(liker, supplier_id)
-        except Exception as e:
-            print(e)
-            database.rollback()
-            continue
-            
-        warning = steps.get_facebook_warning(driver)
-        if warning:
-            print("Looks like they're onto us. Time to stop.")
-            break
+        database = db.db()
+        supplier_id = database.save_supplier(page_name, page_id)
 
-        success = steps.get_next_likers(driver)
-        if not success:
-            print("looks like we reached the end")
-            break
+        while True:
+            try:
+                likers = steps.get_likers(driver)
+                for liker in likers:
+                    database.save_like(liker, supplier_id)
+            except Exception as e:
+                print(e)
+                database.rollback()
+                continue
+                
+            warning = steps.get_facebook_warning(driver)
+            if warning:
+                print("Looks like they're onto us. Time to stop.")
+                break
 
-        time.sleep(1)
+            success = steps.get_next_likers(driver)
+            if not success:
+                print("looks like we reached the end")
+                break
 
+            time.sleep(1)
+
+        print("Finished with: {}".format(page_name))

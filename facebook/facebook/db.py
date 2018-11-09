@@ -20,12 +20,12 @@ class db:
     def rollback(self):
         self.connection.rollback()
     
-    def get_highest_cn(self) -> int:
-        self.cursor.execute("""SELECT highest FROM comment_number ORDER BY highest DESC LIMIT 1""")
+    def get_highest_cn(self, kind: str) -> int:
+        self.cursor.execute("""SELECT highest FROM comment_number WHERE tab = %s ORDER BY highest DESC LIMIT 1""", (kind,))
         return self.cursor.fetchone()[0]
     
-    def update_highest_cn(self, new_highest: int):
-        self.cursor.execute("""INSERT INTO comment_number (highest) VALUES ({});""".format(new_highest))
+    def update_highest_cn(self, new_highest: int, kind: str):
+        self.cursor.execute("""INSERT INTO comment_number (highest, tab) VALUES (%s, %s);""", (new_highest, kind))
         self.commit()
     
     def save_comment(self, comment_data: dict, supplier_id: int) -> int:
@@ -86,7 +86,7 @@ class db:
         return self.cursor.fetchone()[0]
 
     def get_suppliers(self) -> dict:
-        self.cursor.execute("""SELECT id, name, page_id FROM suppliers""")
+        self.cursor.execute("""SELECT id, name, page_id FROM suppliers ORDER BY id""")
         return self.cursor.fetchall()
 
     def get_community_suppliers(self) -> dict:

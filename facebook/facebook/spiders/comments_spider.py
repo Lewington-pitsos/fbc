@@ -8,17 +8,26 @@ step_size = 1500000
 dub_step = 3000000
 huge_step = 10000000
 
+
+home_mid_step = 181969
+home_minimum = 1000000000
+
 class CommentsSpider(scrapy.Spider):
     name = "comments"
 
-    def __init__(self, supplier_name, page_id, user_id, cookies, supplier_id):
-        self.db = db.db()
-        self.prev_highest_cn = self.db.get_highest_cn()
-        self.brain = brain.brain()
+    def __init__(self, supplier_name, page_id, user_id, cookies, supplier_id, kind: str):
+        self.page_id = page_id
+        self.user_id = user_id
+        self.kind = kind
         self.supplier_name = supplier_name
-        self.page_url = url.page_url(page_id, user_id)
-        self.cookies = cookies
         self.supplier_id = supplier_id
+        self.cookies = cookies
+
+        self.db = db.db()
+        self.prev_highest_cn = self.db.get_highest_cn(kind)
+        self.brain = brain.brain(kind)
+        self.set_page_url()
+        self.set_max_cn()
         self.reaction_url = url.reaction_url(user_id)
         self.meta_comment_url = url.meta_comment_url()
         self.meta_comment_body = url.meta_comment_body(user_id)
@@ -32,6 +41,12 @@ class CommentsSpider(scrapy.Spider):
             "sad":7,
             "angry": 8,
         }
+
+    def set_page_url(self):
+        self.page_url = url.home_page_url(self.page_id, self.user_id) if self.kind == "home" else url.community_page_url(self.page_id, self.user_id)
+    
+    def set_max_cn(self):
+        self.max_cn = 1617568483 if self.kind == 'home' else 222645646350
 
     def meta_commenter_request(self, comment_id: int, facebook_comment_id: int):
         return scrapy.Request(
@@ -49,14 +64,14 @@ class CommentsSpider(scrapy.Spider):
     def start_requests(self):
         # Find a good starting comment number
         yield scrapy.Request(
-            url=self.page_url.format(cn=max_cn), 
+            url=self.page_url.format(cn=self.max_cn), 
             cookies=self.cookies,
             callback=self.find_starting_cn
         )
 
     def parse(self, response):
         print("-----xxxxx-----xxxxxx------" + str(self.brain.current_step))
-        if CommentsSpider.has_correct_content_type(response) and CommentsSpider.response_long_enough(response):
+        if CommentsSpider.has_correct_content_type(response) and CommentsSpider.response_long_enough(response) and self.brain.steps_without_new_content < 100:
             comments_to_save = []
             for comment in sel.all_comments(conv.body_html(response.body)):
                 comment_data = sel.comment_data(comment)
@@ -143,7 +158,7 @@ class CommentsSpider(scrapy.Spider):
             else:
                 if self.prev_highest_cn != self.starting_cn:
                     print("New highest observed comment number: {}".format(self.starting_cn))
-                    self.db.update_highest_cn(self.starting_cn)
+                    self.db.update_highest_cn(self.starting_cn, self.kind)
 
                 # Keep stepping down the cn recording comments until there are no more comments
                 self.current_cn = self.starting_cn

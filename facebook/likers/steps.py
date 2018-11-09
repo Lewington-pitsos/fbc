@@ -40,16 +40,26 @@ def get_likers(driver):
     return likers
 
 def get_next_likers(driver):
-    next_page_link = driver.find_elements_by_xpath("//div[@id='see_more_pager']/a")
+    for _ in range(6):
+        try:
+            next_page_link = driver.find_elements_by_xpath("//div[@id='see_more_pager']/a")
 
-    if len(next_page_link) > 0:
-        next_page_link[0].click()
-        return True
+            if len(next_page_link) > 0:
+                next_page_link[0].click()
+                return True
 
-    return False
+            return False
+        except:
+            print("the DOM error thing happened")
+            pass
 
 
 def get_facebook_warning(driver):
-    warning = driver.find_elements_by_xpath("//div[contains(text(), 'It looks like you’re using this feature in a way it wasn’t meant to be used.')]")
+    for _ in range(6):
+        try:
+            warning = driver.find_elements_by_xpath("//div[contains(text(), 'It looks like you’re using this feature in a way it wasn’t meant to be used.')]")
 
-    return len(warning) > 0
+            return len(warning) > 0
+        except:
+            print("the DOM error thing happened")
+            pass
